@@ -54,7 +54,7 @@ public class InterpretadorPLP extends JFrame {
 	private void initialize() {
 		this.setContentPane(getJContentPane());
 		this.setTitle("Interpretador PLP V 0.3");
-		this.setResizable(false);
+		this.setResizable(true);
 		this.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
 		this.listener = new InterpreterKeyListener(this);
 		this.addKeyListener(this.listener);
@@ -64,20 +64,12 @@ public class InterpretadorPLP extends JFrame {
 		this.jTextFieldListaEntrada.setEnabled(false);
 
 		interpreter = new MultiInterpretador(this.jTextAreaMensagens);
-		Dimension d;
-		int w, h;
 
-		w = 390;
-		h = 480;
-
-		d = Toolkit.getDefaultToolkit().getScreenSize();
-		d.height /= 2;
-		d.width /= 2;
-		d.height -= h / 2 + 15;
-		d.width -= w / 2;
-
-		this.setBounds(d.width, d.height, w, h);
-
+		// Configuração para tela cheia
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		this.setSize(screenSize.width, screenSize.height);
+		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		this.setLocationRelativeTo(null);
 	}
 
 	/**
@@ -87,28 +79,41 @@ public class InterpretadorPLP extends JFrame {
 	 */
 	private JPanel getJContentPane() {
 		if (jContentPane == null) {
+			// Obter dimensões da tela
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			int width = screenSize.width;
+			int height = screenSize.height;
+
+			// Calcular novos tamanhos dos componentes
+			int componentWidth = width - 40;
+			int codeAreaHeight = height / 3;
+			int messageAreaHeight = height / 3;
+
 			jLabelListaEntrada = new JLabel();
-			jLabelListaEntrada.setBounds(new java.awt.Rectangle(20, 194, 127,
-					20));
+			jLabelListaEntrada.setBounds(new java.awt.Rectangle(20, codeAreaHeight + 60, 127, 20));
 			jLabelListaEntrada
-					.setToolTipText("informe os valores da lista de entrada separados por espa�os");
+					.setToolTipText("informe os valores da lista de entrada separados por espaços");
 			jLabelListaEntrada.setText("Lista de Entrada");
+
 			jLabelExecutar = new JLabel();
-			jLabelExecutar.setBounds(new java.awt.Rectangle(19, 434, 157, 17));
+			jLabelExecutar.setBounds(new java.awt.Rectangle(20, height - 50, 157, 17));
 			jLabelExecutar.setText("Pressione F1 para executar");
+
 			jLabelMasg = new JLabel();
-			jLabelMasg.setBounds(new java.awt.Rectangle(20, 245, 80, 16));
+			jLabelMasg.setBounds(new java.awt.Rectangle(20, codeAreaHeight + 110, 80, 16));
 			jLabelMasg.setText("Mensagens");
+
 			jLabelCodigo = new JLabel();
 			jLabelCodigo.setBounds(new java.awt.Rectangle(20, 33, 70, 16));
-			jLabelCodigo.setText("C�digo");
+			jLabelCodigo.setText("Código");
+
 			jContentPane = new JPanel();
 			jContentPane.setLayout(null);
-			jContentPane.add(getJScrollPaneMensagens(), null);
+			jContentPane.add(getJScrollPaneMensagens(componentWidth, messageAreaHeight, codeAreaHeight), null);
 			jContentPane.add(jLabelCodigo, null);
 			jContentPane.add(jLabelMasg, null);
-			jContentPane.add(getJScrollPaneCodigo(), null);
-			jContentPane.add(getJTextFieldListaEntrada(), null);
+			jContentPane.add(getJScrollPaneCodigo(componentWidth, codeAreaHeight), null);
+			jContentPane.add(getJTextFieldListaEntrada(componentWidth, codeAreaHeight), null);
 			jContentPane.add(getJComboBoxLinguagens(), null);
 			jContentPane.add(jLabelExecutar, null);
 			jContentPane.add(getJButton(), null);
@@ -137,11 +142,10 @@ public class InterpretadorPLP extends JFrame {
 	 * 
 	 * @return javax.swing.JScrollPane
 	 */
-	private JScrollPane getJScrollPaneMensagens() {
+	private JScrollPane getJScrollPaneMensagens(int width, int height, int yPos) {
 		if (jScrollPaneMensagens == null) {
 			jScrollPaneMensagens = new JScrollPane();
-			jScrollPaneMensagens.setBounds(new java.awt.Rectangle(20, 267, 350,
-					160));
+			jScrollPaneMensagens.setBounds(new java.awt.Rectangle(20, yPos + 130, width, height));
 			jScrollPaneMensagens.setViewportView(getJTextAreaMensagens());
 		}
 		return jScrollPaneMensagens;
@@ -164,11 +168,10 @@ public class InterpretadorPLP extends JFrame {
 	 * 
 	 * @return javax.swing.JScrollPane
 	 */
-	private JScrollPane getJScrollPaneCodigo() {
+	private JScrollPane getJScrollPaneCodigo(int width, int height) {
 		if (jScrollPaneCodigo == null) {
 			jScrollPaneCodigo = new JScrollPane();
-			jScrollPaneCodigo
-					.setBounds(new java.awt.Rectangle(20, 52, 350, 134));
+			jScrollPaneCodigo.setBounds(new java.awt.Rectangle(20, 52, width, height));
 			jScrollPaneCodigo.setViewportView(getJTextAreaCodigo());
 		}
 		return jScrollPaneCodigo;
@@ -188,15 +191,15 @@ public class InterpretadorPLP extends JFrame {
 					.addActionListener(new java.awt.event.ActionListener() {
 						public void actionPerformed(java.awt.event.ActionEvent e) {
 							switch (jComboBoxLinguagens.getSelectedIndex()) {
-							case 0:
-							case 1:
-							case 2:
-							case 3:
-								jTextFieldListaEntrada.setEnabled(false);
-								break;
-							default:
-								jTextFieldListaEntrada.setEnabled(true);
-								break;
+								case 0:
+								case 1:
+								case 2:
+								case 3:
+									jTextFieldListaEntrada.setEnabled(false);
+									break;
+								default:
+									jTextFieldListaEntrada.setEnabled(true);
+									break;
 							}
 						}
 					});
@@ -208,7 +211,7 @@ public class InterpretadorPLP extends JFrame {
 			jComboBoxLinguagens.addItem("Imperativa 1");
 			jComboBoxLinguagens.addItem("Imperativa 2");
 			jComboBoxLinguagens.addItem("Orientada a Objetos 1");
-			jComboBoxLinguagens.addItem("Orientada a Objetos 2");			
+			jComboBoxLinguagens.addItem("Orientada a Objetos 2");
 
 		}
 		return jComboBoxLinguagens;
@@ -244,13 +247,11 @@ public class InterpretadorPLP extends JFrame {
 	 * 
 	 * @return javax.swing.JTextField
 	 */
-	private JTextField getJTextFieldListaEntrada() {
+	private JTextField getJTextFieldListaEntrada(int width, int yPos) {
 		if (jTextFieldListaEntrada == null) {
 			jTextFieldListaEntrada = new JTextField();
-			jTextFieldListaEntrada.setBounds(new java.awt.Rectangle(20, 218,
-					350, 20));
-			jTextFieldListaEntrada
-					.setToolTipText("informe os valores da lista de entrada separados por espa�os");
+			jTextFieldListaEntrada.setBounds(new java.awt.Rectangle(20, yPos + 80, width, 20));
+			jTextFieldListaEntrada.setToolTipText("informe os valores da lista de entrada separados por espaços");
 		}
 		return jTextFieldListaEntrada;
 	}
