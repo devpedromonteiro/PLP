@@ -8,3 +8,8 @@
 */.settings
 
 */target
+
+# Eclipse
+.project
+.classpath
+.settings/
